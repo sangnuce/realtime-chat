@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Real-time Chat Application</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		
+		.wrapper{
+			width: 600px;
+			padding: 10px;
+			margin: 50px auto;
+			border: 1px solid #888;
+		}
+
+		#messages {
+			height: 200px;
+			max-height: 200px;
+			overflow-y: scroll;
+		}
+		
+		#formSendMsg{
+			width: 100%;
+		}
+
+		#message {
+			resize: vertical;
+			width: 100%;
+			min-height: 100px;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrapper">
+		<fieldset>
+			<legend>Messages</legend>
+			<div id="messages">
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Send message</legend>
+			<table id="formSendMsg">
+				<tr>
+					<td>Name:</td>
+					<td><input type="text" id="name"></td>
+				</tr>
+				<tr>
+					<td>Message:</td>
+					<td><textarea id="message" rows="5"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan="2"><button type="button" id="btnSend">Send</button></td>
+				</tr>
+			</table>
+			
+		</fieldset>
+	</div>
+
+	<script src="jquery-2.2.3.min.js"></script>
+	<script src="socket.io-1.4.5.js"></script>
+	<script>
+		$(function(){
+			var socket = io.connect("http://127.0.0.1:5000");
+			socket.on("connect", function(){
+				socket.on("updateMsg", function (data){
+					var msg = data.name + " : " + data.message + "<br>";
+					$("#messages").append(msg);
+				});
+			});
+			$("#btnSend").click(function(){
+				var name = $("#name").val();
+				var message = $("#message").val();
+				socket.emit("sendMsg", {name: name, message: message});
+			});
+		});
+	</script>
+</body>
+</html>
